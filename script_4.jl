@@ -7,7 +7,7 @@ function field!(robot)
     do_upora!(robot, Sud)
     do_upora!(robot, West)
     side = Ost
-    while !isborder(robot, Nord) || !isborder(robot, Ost)
+    while !(isborder(robot, Nord) && isborder(robot, Ost))
         markers!(robot, side)
         putmarker!(robot)
         move!(robot, Nord)
