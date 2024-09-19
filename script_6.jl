@@ -5,26 +5,56 @@ robot = Robot(animate=true)
 function printer!(robot)
     do_upora!(robot, Sud)
     do_upora!(robot, West)
+    n = num_steps(robot)
 
-    side = Ost
-    for i in 0:2:2
-        while !(isborder(robot, HorizonSide(i)) && isborder(robot, HorizonSide(i+1)))
+ 
+    for i in (Ost, West) #Nord = 0, Ost = 1, Sud = 2, West = 3
+
+        side = i
+        steps = 0
+        m = 0
+
+        while steps != (n+1)
             while !isborder(robot, side)
+
                 for i in (Nord, Ost, Sud, West)
-                    if isborder(robot, i) && !ismarker(robot)
+                    if isborder(robot, i) == true && ismarker(robot) == false
                         putmarker!(robot)
                         break
                     end            
                 end
-                move!(robot, side)
+
+                move!(robot, side) # Ost -> West
             end
+
+            if m < n
+                putmarker!(robot)
+                if i == Ost
+                    move!(robot, Nord)
+                else
+                    move!(robot, Sud)
+                end
+                m += 1
+            end
+
             side = inverse(side)
-            move!(robot, Nord)
+
+            steps += 1
         end
-    end
+    end 
 end
 
 inverse(side::HorizonSide) = HorizonSide((Int(side)+2)%4)
+
+function num_steps(robot)
+    n = 0
+    while !isborder(robot, Nord)
+        move!(robot, Nord)
+        n += 1
+    end
+    do_upora!(robot, Sud)
+    return n
+end
 
 function do_upora!(robot, side)
     while !isborder(robot, side)
