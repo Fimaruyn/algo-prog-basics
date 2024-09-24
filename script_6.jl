@@ -1,10 +1,13 @@
 # Два периметра
 using HorizonSideRobots
-robot = Robot(animate=true)
+#robot = Robot(animate=true)
 
 function printer!(robot)
-    do_upora!(robot, Sud)
-    do_upora!(robot, West)
+    while !isborder(robot, Sud) || !isborder(robot, West)
+        do_upora(robot, Sud)
+        do_upora(robot, West)
+    end
+
     n = num_steps(robot)
 
  
@@ -62,4 +65,4 @@ function do_upora!(robot, side)
     end
 end
 
-printer!(robot)
+#printer!(robot)
