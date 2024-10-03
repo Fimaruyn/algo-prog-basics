@@ -1,13 +1,24 @@
-# Периметр с перегоротками
-using HorizonSideRobots
-#robot = Robot(animate = true)
+#=
+ДАНО: Робот - в произвольной клетке ограниченного прямоугольного
+поля, на котором могут находиться также внутренние прямоугольные
+перегородки (все перегородки изолированы друг от друга, прямоугольники
+могут вырождаться в отрезки)
 
+РЕЗУЛЬТАТ: Робот - в исходном положении и
+a) по всему периметру внешней рамки стоят маркеры;
+б) маркеры не во всех клетках периметра, а только в 4-х позициях -
+напротив исходного положения робота
+=#
+
+using HorizonSideRobots
+
+#Главная функция
 function perim_cross!(robot)
     path = []
     num_sud = 0
     num_west = 0
 
-
+    # Маршрут из исходной клетки в юго-западный угол
     while !isborder(robot, Sud) || !isborder(robot, West)
         s = do_upora(robot, Sud)
         w = do_upora(robot, West)
@@ -16,10 +27,11 @@ function perim_cross!(robot)
         push!(path, (s, w))
     end
 
+    #Высота и ширина поля
     n = num_steps_Nord(robot)
     ww = num_steps_West(robot)
 
-
+    # Робот перемещается по периметру и маркирует клетки относительно исходной
     for side in (Nord, Ost, Sud, West)
         if side == Nord
             for i in 1:num_sud
@@ -46,6 +58,7 @@ function perim_cross!(robot)
         end
     end 
 
+    # Возвращение в исходную клетку
     for p in reverse(path)
         s = p[1]
         w = p[2]
@@ -60,6 +73,7 @@ function perim_cross!(robot)
     end
 end
 
+# Высота поля
 function num_steps_Nord(robot)
     n = 0
     while !isborder(robot, Nord)
@@ -70,6 +84,7 @@ function num_steps_Nord(robot)
     return n
 end
 
+# Ширина поля
 function num_steps_West(robot)
     w = 0
     while !isborder(robot, Ost)
