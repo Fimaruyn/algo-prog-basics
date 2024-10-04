@@ -9,6 +9,23 @@ using HorizonSideRobots; robot = Robot("field_ex_7.sit", animate = true); includ
 =#
 using HorizonSideRobots
 
+# Главная функция
 function prohod!(robot)
-    
+    # Принцип маятника
+    side = Ost
+    num_steps = 1
+    while isborder(robot, Nord)
+        move!(robot, side, num_steps)
+        side = inverse(side)
+        num_steps += 1
+    end    
+end
+
+# Меняет сторону света на противоположную
+inverse(side::HorizonSide) = HorizonSide((Int(side)+2)%4)
+
+function HorizonSideRobots.move!(robot, side, num_steps)
+    for i in 1:num_steps
+        move!(robot, side)
+    end
 end
