@@ -47,11 +47,11 @@ inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
 function markers!(robot, side, flag)
     while !isborder(robot, side)
         if flag == 1
-            move!(robot, side) 
             putmarker!(robot) 
+            move!(robot, side) 
         elseif flag == 0
-            putmarker!(robot) 
             move!(robot, side) 
+            putmarker!(robot) 
         end
         if !isborder(robot, side) 
             move!(robot, side) 
