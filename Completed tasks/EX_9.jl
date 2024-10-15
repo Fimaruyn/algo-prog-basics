@@ -8,35 +8,54 @@
 
 using HorizonSideRobots
 
+#Главная функция
 function field!(robot)
-    n = 0
-    n += do_upora(robot, Sud)
-    n += do_upora(robot, West)
+    #Юго-западная клетка + четность/нечетность пути
+    n = 0; s = 0; w = 0
+    s += do_upora(robot, Sud)
+    w += do_upora(robot, West)
+    n = s + w
     if n%2 == 0 
-        flag = True 
+        flag = 1
     else 
-        flag = False 
+        flag = 0
     end
-
+    
     side = Ost
     while !isborder(robot, Nord) || !isborder(robot, Ost)
-        markers!(robot, side, n)
-        move!(robot, Nord)
+        markers!(robot, side, flag)
+        if !isborder(robot, Nord)
+            move!(robot, Nord)
+        end
         side = inverse(side)
+    end
+
+    #В исходную клетку
+    do_upora(robot, Sud)
+    do_upora(robot, West)
+    for i in 1:s
+        move!(robot, Nord)
+    end
+    for i in 1:w
+        move!(robot, Ost)
     end
 end
 
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
 
-function markers!(robot, side, flag::Bool)
+# Закрашивание линии в шахматном порядке
+function markers!(robot, side, flag)
     while !isborder(robot, side)
-        if flag 
+        if flag == 1
+            move!(robot, side) 
+            putmarker!(robot) 
+        elseif flag == 0
             putmarker!(robot) 
             move!(robot, side) 
-        else move!(robot, side) 
-            putmarker!(robot) 
         end
-        if !isborder(robot, side) move!(robot, side) end
+        if !isborder(robot, side) 
+            move!(robot, side) 
+        end
     end
 end
 
