@@ -19,7 +19,8 @@ function partitions!(robot)
     num_part = 0
     side = Ost
     while (!isborder(robot, Sud) || !isborder(robot, Ost)) && (!isborder(robot, Sud) || !isborder(robot, West))
-        num_part += line(robot, side)
+        num_part += numborders!(robot, side)
+            (robot, side)
         if !isborder(robot, Sud)
             move!(robot, Sud)
             k +=1
@@ -43,18 +44,18 @@ end
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
 
 # Перемещение по строке с подсчетом перегородок
-function line(robot, side)
-    num_part = 0
+function numborders!(robot, side)
+    state = 0
+    num_borders = 0
     while !isborder(robot, side)
         move!(robot, side)
-        if isborder(robot, Sud)
-            num_part += 1
-            while isborder(robot, Sud)
-                move!(robot, side)
-            end
+        if state == 0
+            (isborder(robot, Sud) == true) && (state = 1; num_borders += 1)
+        elseif state == 1
+            (isborder(robot, Sud) == false) && (state = 0)
         end
     end
-    return num_part
+    return num_borders
 end
 
 # Перемещение в заданном направлении до стенки с подсчетом клеток
