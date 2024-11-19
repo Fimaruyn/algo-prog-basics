@@ -1,11 +1,6 @@
-#=
-ДАНО: Робот находится в произвольной клетке ограниченного
-прямоугольного поля без внутренних перегородок и маркеров.
-
-РЕЗУЛЬТАТ: Робот — в исходном положении в центре косого креста из
-маркеров, расставленных вплоть до внешней рамки.
-=#
 using HorizonSideRobots
+#EX_1: mark_cross(robot, (Nord, Ost, Sud, West))
+#EX_4: mark_cross(robot, ((Nord, Ost), (Ost, Sud), (Sud, West), (West, Nord)))
 
 function mark_cross(robot, sides)
     for side in sides 
@@ -17,6 +12,7 @@ end
 
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
 inverse(side::NTuple{2, HorizonSide}) = inverse.(side)
+
 
 function mark_direct(robot, side)
     n::Int = 0
@@ -30,5 +26,3 @@ end
 
 HorizonSideRobots.isborder(robor, side::NTuple{2, HorizonSide}) = isborder(robot, side[1]) || isborder(robot, side[2])
 HorizonSideRobots.move!(robot, side::Any) = for s in side move!(robot, s) end
-
-#mark_cross(robot, ((Nord, Ost), (Ost, Sud), (Sud, West), (West, Nord)))

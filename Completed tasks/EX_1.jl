@@ -9,27 +9,18 @@
 
 using HorizonSideRobots
 
-# Главная функция
-function cross!(robot)
-    for side in (Nord, Ost, Sud, West)
-        num_steps = mark_direct!(robot, side)
-        side = inverse(side)
-        move!(robot, side, num_steps)
+function mark_cross(robot, sides)
+    for side in sides 
+        n = mark_direct(robot, side)
+        s = inverse(side)
+        for i in 1:n move!(robot, s) end
     end
 end
 
-# Измененный move!. Добавлен цикл с счетчиком
-function HorizonSideRobots.move!(robot, side, num_steps::Integer)
-    for _ in 1:num_steps
-        move!(robot, side)        
-    end
-end
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
+inverse(side::NTuple{2, HorizonSide}) = inverse.(side)
 
-# Меняет сторону света на противоположную
-inverse(side::HorizonSide) = HorizonSide((Int(side)+2)%4)
-
-# Движение до стенки с покраской клетки и счетчиком
-function mark_direct!(robots, side)::Int
+function mark_direct(robot, side)
     n::Int = 0
     while !isborder(robot, side)
         move!(robot, side)
@@ -38,3 +29,8 @@ function mark_direct!(robots, side)::Int
     end
     return n
 end
+
+HorizonSideRobots.isborder(robor, side::NTuple{2, HorizonSide}) = isborder(robot, side[1]) || isborder(robot, side[2])
+HorizonSideRobots.move!(robot, side::Any) = for s in side move!(robot, s) end
+
+#mark_cross(robot, (Nord, Ost, Sud, West))

@@ -8,34 +8,42 @@
 
 using HorizonSideRobots
 
-# Главная функция
-function perim!(robot)
-    s = 0; w = 0
-    s += do_upora(robot, Sud)
-    w += do_upora(robot, West)
-    for side in (Nord, Ost, Sud, West)
-        while !isborder(robot, side)
-            move!(robot, side)
-            putmarker!(robot)
-        end
-    end
-
-    # Возвращение в исходное положение
-    for i in 1:s
-        move!(robot, Nord)
-    end
-    for k in 1:w
-        move!(robot, Ost)
-    end
-    
+mutable struct ChessRobot
+    robot::Robot
+    flag::Bool
 end
 
-# Перемещение в заданном направлении до стенки с подсчетом клеток
-function do_upora(robot, side)
-    num_steps = 0
-    while !isborder(robot, side)
-        num_steps += 1
-        move!(robot, side)
-    end
-    return num_steps
+function HorizonSideRobots.move!(robot::ChessRobot, side)
+    robot.flag && putmarker!(robot.robot)
+    robot.flag = !robot.flag
+    move!(robot.robot, side)
 end
+
+#HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robo.robot) 
+HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
+#HorizonSideRobots.ismarker(robot::ChessRobot) = ismarker(robot.robot)
+#HorizonSideRobots.temperature(robot::ChessRobot) = temperature(robot.robot)
+
+function corner(robot, side)
+    for s in side 
+        movetoend!(robot, s) 
+    end
+end
+
+function perimeter!(robot)
+    for s in (Nord, Ost, Sud, West)
+        movetoend!(robot, s)
+    end
+end
+
+function movetoend!(robot, side)
+    while trymove!(robot, side) end
+end
+
+function trymove!(robot, side)
+    isborder(robot, side) && return false
+    move!(robot, side)
+    return true
+end
+
+#corner(robot, (Sud, West)); robot = ChessRobot(robot, true); perimeter!(robot)
