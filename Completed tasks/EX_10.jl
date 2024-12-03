@@ -41,7 +41,8 @@ HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robot.robot)
 
 function chessmark!(robot::Robot, N::Int)
     corner!(robot, (Sud, West))
-    snake!(ChessRobot{N}(robot, Coordinates(0,0)), (Ost, Nord)) do side
+    robot = ChessRobot{N}(robot, Coordinates(0,0))
+    snake!(robot, (Ost, Nord)) do side
         isborder(robot, side) && isborder(robot, Nord)
     end
 end

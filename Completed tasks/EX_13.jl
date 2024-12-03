@@ -25,9 +25,7 @@ end
 function HorizonSideRobots.move!(robot::ChessRobot, side::HorizonSide) 
     x = mod(robot.coord.x, 2) 
     y = mod(robot.coord.y, 2) 
-    if x == y
-        putmarker!(robot.robot)
-    end 
+    (x == y) && putmarker!(robot.robot)
     move!(robot.robot, side)
     robot.coord = move(robot.coord, side)
 end
