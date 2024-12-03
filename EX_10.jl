@@ -26,7 +26,7 @@ mutable struct ChessRobot{N}
 end
 
 
-function HorizonSideRobots.move!(robot::ChessRobot{N}, side::HorizonSide) where N #<: Integer
+function HorizonSideRobots.move!(robot::ChessRobot{N}, side::HorizonSide) where {N}
     x = mod(robot.coord.x, 2*N) 
     y = mod(robot.coord.y, 2*N) 
     if ((x in 0:N-1) && (y in 0:N-1)) || ((x in N:2*N-1) && (y in N:2*N-1)) 
@@ -39,7 +39,8 @@ end
 HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
 HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robot.robot)
 
-function chesmark!(robot::Robot, N::Int)
+function chessmark!(robot::Robot, N::Int)
+    corner!(robot, (Sud, West))
     snake!(ChessRobot{N}(robot, Coordinates(0,0)), (Ost, Nord)) do side
         isborder(robot, side) && isborder(robot, Nord)
     end
