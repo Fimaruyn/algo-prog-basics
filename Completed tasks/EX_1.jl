@@ -13,7 +13,7 @@ function mark_cross(robot, sides)
     for side in sides 
         n = mark_direct(robot, side)
         s = inverse(side)
-        for i in 1:n move!(robot, s) end
+        for _ in 1:n move!(robot, s) end
     end
 end
 
@@ -30,7 +30,7 @@ function mark_direct(robot, side)
     return n
 end
 
-HorizonSideRobots.isborder(robor, side::NTuple{2, HorizonSide}) = isborder(robot, side[1]) || isborder(robot, side[2])
+HorizonSideRobots.isborder(robot, side::NTuple{2, HorizonSide}) = isborder(robot, side[1]) || isborder(robot, side[2])
 HorizonSideRobots.move!(robot, side::Any) = for s in side move!(robot, s) end
 
 #mark_cross(robot, (Nord, Ost, Sud, West))

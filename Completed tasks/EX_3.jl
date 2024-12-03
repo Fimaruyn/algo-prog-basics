@@ -14,9 +14,11 @@ function snake!(stop_condition::Function, robot, sides::NTuple{2,HorizonSide})
             stop_condition(s) || isborder(robot, s)
         end 
         if stop_condition(s) 
+            putmarker!(robot)
             break 
         end 
         s = inverse(s) 
+        putmarker!(robot)
         move!(robot, sides[2]) 
     end
 end
@@ -28,7 +30,9 @@ inverse(side::NTuple{2, HorizonSide}) = inverse.(side)
 
 function corner!(robot, sides::NTuple{2, HorizonSide})
     for s in sides 
-        movetoend!((),robot, s) 
+        movetoend!(robot, s) do 
+            isborder(robot, s)
+        end
     end
 end
 

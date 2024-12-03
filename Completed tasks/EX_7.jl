@@ -10,7 +10,7 @@ using HorizonSideRobots; robot = Robot("field_ex_7.sit", animate = true); includ
 using HorizonSideRobots
 
 # Главная функция
-function prohod!(robot)
+function passage!(robot)
     # Принцип маятника
     side = Ost
     num_steps = 1

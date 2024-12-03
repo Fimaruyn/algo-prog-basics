@@ -10,15 +10,25 @@ using HorizonSideRobots
 
 
 
-
-
-
-
-
+function snake!(stop_condition::Function, robot, sides::NTuple{2,HorizonSide}) 
+    s=sides[1] 
+    while !stop_condition(s) 
+        movetoend!(robot, s) do 
+            stop_condition(s) || isborder(robot, s)
+        end 
+        if stop_condition(s)
+            break 
+        end 
+        putmarker!(robot)
+        s = inverse(s) 
+        move!(robot, sides[2])
+        putmarker!(robot) 
+    end
+end
 
 function move_border!(robot, side)
     if !isborder(robot, side)
-        move!(robot, side) # - первый шаг в сторону препятствия         
+        move!(robot, side) # - первый шаг в сторону препятствия       
         movetoend!(robot, side) do # - проход через толщу препятсятвия
             !isborder(robot, left(side))
         end
@@ -34,3 +44,14 @@ movetoend!(stop_condition::Function, robot, side) = while !stop_condition() move
 left(side::HorizonSide) = HorizonSide(mod(Int(side)+1, 4))
 right(side::HorizonSide) = HorizonSide(mod(Int(side)+3, 4))
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
+
+function corner!(robot, sides::NTuple{2, HorizonSide})
+    for s in sides 
+        movetoend!(robot, s) do 
+            isborder(robot, s)
+        end
+    end
+end
+
+
+#corner!(robot, (West, Sud)); snake!(robot, (Ost,Nord)) do s isborder(robot,s)&&isborder(robot,Nord) end

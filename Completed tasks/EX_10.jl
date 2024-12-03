@@ -8,64 +8,68 @@
 =#
 using HorizonSideRobots
 
-#Главная функция
-function big_chess!(robot)
-    n = 3; s = 0; w = 0
-    k = 0
-    s += do_upora(robot, Sud)
-    w += do_upora(robot, West)
+mutable struct Coordinates
+    x::Int
+    y::Int
+end
 
-    x = 0
-    y = 0
-    side = Ost
-    #Закрасить поле в шахматном порядке клетками размером n*n
-    while !isborder(robot, Nord) || !isborder(robot, Ost)
-        
-        while !isborder(robot, side)
-            if (mod(x, 2*n) <= n-1) && (mod(y, 2*n) <= n-1) || (mod(x, 2*n) > n-1) && (mod(y, 2*n) > n-1)
-                putmarker!(robot)
-            end
-            move!(robot, side)
-            if side == Ost
-                x += 1
-            else
-                x -= 1
-            end
-            
-        end
+function move(coord::Coordinates, side::HorizonSide) 
+    side == Nord && return Coordinates(coord.x, coord.y+1) 
+    side == Sud && return Coordinates(coord.x, coord.y-1) 
+    side == Ost && return Coordinates(coord.x+1, coord.y) 
+    side == West && return Coordinates(coord.x-1, coord.y) 
+end
 
-        if !isborder(robot, Nord)
-            if (mod(x, 2*n) <= n-1) && (mod(y, 2*n) <= n-1) || (mod(x, 2*n) > n-1) && (mod(y, 2*n) > n-1)
-                putmarker!(robot)
-            end
-            move!(robot, Nord)
-            y += 1
-        end
-        side = inverse(side)
-    end
+mutable struct ChessRobot{N}
+    robot::Robot
+    coord::Coordinates
+end
 
-    # Проверка на закрашивание северо-восточного угла
-    if (mod(x, 2*n) <= n-1) && (mod(y, 2*n) <= n-1) || (mod(x, 2*n) > n-1) && (mod(y, 2*n) > n-1)
-        putmarker!(robot)
-    end
 
-    # Возврат в исходную клетку
-    for i in 1:(y - s)
-        move!(robot, Sud)
-    end
-    for i in 1:(x - w)
-        move!(robot, West)
+function HorizonSideRobots.move!(robot::ChessRobot{N}, side::HorizonSide) where N #<: Integer
+    x = mod(robot.coord.x, 2*N) 
+    y = mod(robot.coord.y, 2*N) 
+    if ((x in 0:N-1) && (y in 0:N-1)) || ((x in N:2*N-1) && (y in N:2*N-1)) 
+        putmarker!(robot.robot)
+    end 
+    move!(robot.robot, side)
+    robot.coord = move(robot.coord, side)
+end
+
+HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
+HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robot.robot)
+
+function chesmark!(robot::Robot, N::Int)
+    snake!(ChessRobot{N}(robot, Coordinates(0,0)), (Ost, Nord)) do side
+        isborder(robot, side) && isborder(robot, Nord)
     end
 end
 
-inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
-
-# Перемещение в заданном направлении до стенки с подсчетом клеток
-function do_upora(robot, side)
-    num_steps = 0
-    while !isborder(robot, side)
-        num_steps += 1
-        move!(robot, side)
+function snake!(stop_condition::Function, robot, sides::NTuple{2,HorizonSide})
+    s=sides[1] 
+    while !stop_condition(s) 
+        movetoend!(robot, s) do 
+            stop_condition(s) || isborder(robot, s)
+        end 
+        if stop_condition(s)
+            putmarker!(robot) 
+            break 
+        end 
+        s = inverse(s) 
+        move!(robot, sides[2]) 
     end
-    return num_steps
+end
+
+movetoend!(stop_condition::Function, robot, side) = while !stop_condition() move!(robot, side) end
+
+
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
+inverse(side::NTuple{2, HorizonSide}) = inverse.(side)
+
+function corner!(robot, sides::NTuple{2, HorizonSide})
+    for s in sides 
+        movetoend!(robot, s) do 
+            isborder(robot, s)
+        end
+    end
 end

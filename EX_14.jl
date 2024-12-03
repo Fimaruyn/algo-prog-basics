@@ -1,7 +1,10 @@
 #=
-Решить задачу 9 с использованием обобщённой функции
-snake!(robot, (move_side, next_row_side)::NTuple{2,HorizonSide} = (Ost,Nord))
+Решить предыдущую задачу, но при условии наличия на поле простых
+внутренних перегородок.
+Под простыми перегородками мы понимаем изолированные
+прямолинейные или прямоугольные перегородки.
 =#
+
 using HorizonSideRobots
 
 mutable struct ChessRobot
@@ -52,5 +55,22 @@ function corner!(robot, sides::NTuple{2, HorizonSide})
     if n%2==0 flag = true else flag = false end
     return flag
 end
+
+function move_border!(robot, side)
+    if !isborder(robot, side)
+        move!(robot, side) # - первый шаг в сторону препятствия         
+        movetoend!(robot, side) do # - проход через толщу препятсятвия
+            !isborder(robot, left(side))
+        end
+        return # - завершение очередного рекурсивного вызова
+    end
+    move!(robot, right(side)) # - шаг в сторону обхода препятсятвия
+    move_border!(robot, side) # - рекурсия
+    move!(robot, left(side)) # - отложенный до окончания рекурсии обратный шаг
+end
+
+left(side::HorizonSide) = HorizonSide(mod(Int(side)+1, 4))
+right(side::HorizonSide) = HorizonSide(mod(Int(side)+3, 4))
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
 
 #robot = ChessRobot(robot, corner!(robot, (West, Sud))); snake!(robot, (Ost,Nord)) do s isborder(robot,s)&&isborder(robot,Nord) end
