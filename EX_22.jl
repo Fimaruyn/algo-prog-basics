@@ -12,14 +12,51 @@
 =#
 
 using HorizonSideRobots
-
+#=
 function doubledist!(robot, side) 
-    isborder(robot, inverse(side)) && return 
-    move!(robot, inverse(side)) 
-    doubledist!(robot, side) 
-    move!(robot, side, 2) 
+    isborder(robot, (side)) && return 
+    move!(robot, (side)) 
+    doubledist!(robot, (side)) 
+    move!(robot, inverse(side), 2) 
 end
 
 HorizonSideRobots.move!(robot, side, n) = for _ in 1:n move!(robot, side) end
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))
-#??????????????????????????????? что такое заданное направление
+=#
+function trydoubledist!(robot, side)
+    n, m = trydoubledist_!(robot, side)
+    if m == 2*n 
+        return true
+    else
+        move!(robot, inverse(side), 2*n-m)
+        return false
+    end
+end
+
+function trydoubledist_!(robot, side)
+    trymove!(robot, side) || return 0, 0
+    num_forward_steps, num_inverse_steps = trydoubledist_!(robot, side)
+    if trymove!(robot, inverse(side))
+        if trymove!(robot, inverse(side))
+            return num_forward_steps + 1, num_inverse_steps + 2
+        else
+            return num_forward_steps + 1, num_inverse_steps + 1
+        end
+    else
+        return num_forward_steps + 1, num_inverse_steps
+    end
+end
+
+function trymove!(robot, side)
+    isborder(robot, side) && return false
+    move!(robot, side)
+    return true
+end
+
+function HorizonSideRobots.move!(robot, side, num_steps::Integer)
+    num_steps == 0 && return
+    move!(robot, side)
+    move!(robot, side, num_steps-1)
+end
+
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))

@@ -17,3 +17,5 @@ function halfdist_plus!(robot, side)
     halfdist_minus!(robot, side) 
     move!(robot, inverse(side)) 
 end
+
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side)+2, 4))

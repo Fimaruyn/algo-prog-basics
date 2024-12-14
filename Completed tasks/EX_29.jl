@@ -76,7 +76,7 @@ function borderlabirint_traversal!(actions::Function, lab_robot::LabirintRobot)
         trymove!(lab_robot.coord_robot, side) && begin 
             borderlabirint_traversal!(actions, lab_robot) 
             move!(lab_robot.coord_robot, inverse(side))
-    end
+        end
     end  
 end 
 

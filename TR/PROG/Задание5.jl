@@ -1,9 +1,13 @@
+# ЗАДАЧИ 15-17 КМБО-11-24 Белов В.А
+
+
+
 #=
-Решить предыдущую задачу, но при условии наличия на поле простых
-внутренних перегородок.
-Под простыми перегородками мы понимаем изолированные
-прямолинейные или прямоугольные перегородки.
+ЗАДАЧА 15
+
+Решить задачу 4, но при условии наличия на поле простых внутренних перегородок.
 =#
+#=
 using HorizonSideRobots
 
 mutable struct Coordinates
@@ -24,9 +28,9 @@ mutable struct ChessRobot
 end
 
 function HorizonSideRobots.move!(robot::ChessRobot, side::HorizonSide) 
-    x = mod(robot.coord.x, 2) 
-    y = mod(robot.coord.y, 2) 
-    if x == y
+    x = robot.coord.x
+    y = robot.coord.y
+    if ((x == y) || (x == -y) || (-x == y) || (-x == -y)) && (x != 0) && (y != 0)
         putmarker!(robot.robot)
     end 
     move!(robot.robot, side)
@@ -38,7 +42,7 @@ HorizonSideRobots.move!(robot::ChessRobot, side, nsteps::Integer) = for _ in 1:n
 HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
 HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robot.robot)
 
-function chessmark!(robot::Robot)
+function mark_cross!(robot::Robot)
     robot = ChessRobot(robot, Coordinates(0,0))
     corner!(robot, (Sud, West))
     snake!(robot, (Ost, Nord)) do side
@@ -103,3 +107,61 @@ function trymove!(robot, side)::Bool
     move!(robot, left(side), nsteps)  
     return result 
 end
+=#
+
+
+#=
+ЗАДАЧА 16
+
+Решить задачу 7 с использованием обобщённой функции
+shuttle!(stop_condition::Function, robot, side)
+=#
+#=
+using HorizonSideRobots
+
+
+function shuttle!(stop_condition::Function, robot, side) 
+    s = Ost
+    n = 0 
+    while !stop_condition(side) 
+        move!(robot, s, n) 
+        s = inverse(s) 
+        n += 1 
+    end 
+end
+
+inverse(side::HorizonSide) = HorizonSide((Int(side)+2)%4)
+HorizonSideRobots.move!(robot, side, num_steps) = for i in 1:num_steps move!(robot, side) end
+=#
+
+
+
+#=
+ЗАДАЧА 17
+
+Решить задачу 8 с использованием обобщённой функции
+spiral!(stop_condition::Function, robot)
+=#
+#=
+using HorizonSideRobots
+
+function spiral!(stop_condition::Function, robot) 
+    nmax_steps = 1
+    s = Nord 
+    while !find_direct!(stop_condition::Function, robot, s, nmax_steps) 
+        (s in (Nord, Sud)) && (nmax_steps += 1) 
+        s = left(s) 
+    end 
+end 
+
+function find_direct!(stop_condition::Function, robot, side, nmax_steps) 
+    n = 0 
+    while !stop_condition() && (n < nmax_steps)
+        move!(robot, side) 
+        n += 1 
+    end 
+    return stop_condition()
+end
+
+left(side::HorizonSide) = HorizonSide(mod(Int(side)+1, 4))
+=#

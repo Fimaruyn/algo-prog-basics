@@ -12,12 +12,12 @@ function markchess_a!(robot, side)
     putmarker!(robot) 
     isborder(robot, side) && return
     move!(robot, side) 
-    markchess_0!(robot, side) 
+    markchess_a!(robot, side) 
 end
 
 function markchess_b!(robot, side) 
     isborder(robot, side) && return
     move!(robot, side) 
     putmarker!(robot)
-    markchess_1!(robot, side) 
+    markchess_b!(robot, side) 
 end

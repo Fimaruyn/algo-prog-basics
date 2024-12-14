@@ -1,8 +1,5 @@
 #=
-Решить предыдущую задачу, но при условии наличия на поле простых
-внутренних перегородок.
-Под простыми перегородками мы понимаем изолированные
-прямолинейные или прямоугольные перегородки.
+Решить задачу 4, но при условии наличия на поле простых внутренних перегородок.
 =#
 using HorizonSideRobots
 
@@ -24,9 +21,9 @@ mutable struct ChessRobot
 end
 
 function HorizonSideRobots.move!(robot::ChessRobot, side::HorizonSide) 
-    x = mod(robot.coord.x, 2) 
-    y = mod(robot.coord.y, 2) 
-    if x == y
+    x = robot.coord.x
+    y = robot.coord.y
+    if ((x == y) || (x == -y) || (-x == y) || (-x == -y)) && (x != 0) && (y != 0)
         putmarker!(robot.robot)
     end 
     move!(robot.robot, side)
@@ -38,7 +35,7 @@ HorizonSideRobots.move!(robot::ChessRobot, side, nsteps::Integer) = for _ in 1:n
 HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
 HorizonSideRobots.putmarker!(robot::ChessRobot) = putmarker!(robot.robot)
 
-function chessmark!(robot::Robot)
+function mark_cross!(robot::Robot)
     robot = ChessRobot(robot, Coordinates(0,0))
     corner!(robot, (Sud, West))
     snake!(robot, (Ost, Nord)) do side

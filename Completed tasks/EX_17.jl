@@ -24,3 +24,5 @@ function find_direct!(stop_condition::Function, robot, side, nmax_steps)
 end
 
 left(side::HorizonSide) = HorizonSide(mod(Int(side)+1, 4))
+
+#spiral!(()->ismarker(robot),robot)

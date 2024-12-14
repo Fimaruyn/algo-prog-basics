@@ -9,9 +9,19 @@ using HorizonSideRobots
 
 function movesym!(robot, side) 
     isborder(robot, inverse(side)) && (movetoend!(robot, side); return)
-    move!(robot, inverse(side)) 
+    move!(robot, inverse(side))
     movesym!(robot, side) 
+    #move!(robot, (side))
 end
+
+#=
+function movesym!(robot, side) 
+    isborder(robot, (side)) && (movetoend!(robot, inverse(side)); return)
+    move!(robot, side)
+    movesym!(robot, side) 
+    move!(robot, inverse(side))
+end
+=#
 
 function movetoend!(robot, side)
     !isborder(robot, side) && (move!(robot, side); return) 
